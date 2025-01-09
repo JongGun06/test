@@ -16,9 +16,14 @@ app.use('/users', userRoutes);
 
 // Подключение к MongoDB
 mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    // Проверим, если это сервер для серверлес-функции (например, для Vercel)
+    if (process.env.VERCEL) {
+      module.exports = app;  // Экспортируем для серверлес-функции
+    } else {
+      app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    }
   })
   .catch((error) => console.error('Error connecting to MongoDB:', error));
